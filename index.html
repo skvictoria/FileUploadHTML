@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--
+/*
+ * jQuery File Upload Demo
+ * https://github.com/blueimp/jQuery-File-Upload
+ *
+ * Copyright 2010, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * https://opensource.org/licenses/MIT
+ */
+-->
+<html lang="en">
+  <head>
+    <!-- Force latest IE rendering engine or ChromeFrame if installed -->
+    <!--[if IE]>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <![endif]-->
+    <meta charset="utf-8" />
+    <title>함안 딥러닝 병해충</title>
+    <meta
+      name="description"
+      content="File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for jQuery. Supports cross-domain, chunked and resumable file uploads and client-side image resizing. Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap styles -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
+    <!-- Generic page styles -->
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      #picture {
+        background-image: url('./tomatoes.png');
+        min-height: 100%;
+        background-size: cover;
+        background-position: center;
+      }
+      #navigation {
+        margin: 10px 0;
+      }
+    </style>
+    <!-- blueimp Gallery styles -->
+    <link
+      rel="stylesheet"
+      href="https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css"
+    />
+    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+    <link rel="stylesheet" href="css/jquery.fileupload.css" />
+    <link rel="stylesheet" href="css/jquery.fileupload-ui.css" />
+    <!-- CSS adjustments for browsers with JavaScript disabled -->
+    <noscript
+      ><link rel="stylesheet" href="css/jquery.fileupload-noscript.css"
+    /></noscript>
+    <noscript
+      ><link rel="stylesheet" href="css/jquery.fileupload-ui-noscript.css"
+    /></noscript>
+    <script
+      type="text/javascript"
+      src="//code.jquery.com/jquery-3.1.0.min.js"
+      charset="utf-8"
+    ></script>
+    <script type="text/javascript">
+      var sel_file;
+      $(document).ready(function() {
+        $('#input_img').on('change', handleImgFileSelect);
+      });
+      function handleImgFileSelect(e) {
+        var files = e.target.files;
+        var filesArr = Array.prototype.slice.call(files);
+
+        filesArr.forEach(function(f) {
+          if (!f.type.match('image.*')) {
+            alert('not right document');
+            return;
+          }
+          sel_file = f;
+
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            $('#img').attr('src', e.target.result);
+          };
+          reader.readAsDataURL(f);
+        });
+      }
+    </script>
+  </head>
+  <body id="picture">
+    <div class="container">
+      <ul class="nav nav-tabs" id="navigation">
+        <li class="active">
+          <a href="#">토마토 잎 병해</a>
+        </li>
+        <li>
+          <a href="#">해충</a>
+        </li>
+      </ul>
+      <h1 id="title" style="color:white">파일을 업로드해주세요</h1>
+      <blockquote id="description">
+        <p style="color:white">
+          설명 넣을게 있을까<br />
+          토마토 잎 사진을 아래에 업로드해주세요!
+        </p>
+      </blockquote>
+      <!-- The file upload form used as target for the file upload widget -->
+      <form
+        id="fileupload"
+        action="submitconfirm.php"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- Redirect browsers with JavaScript disabled to the origin page -->
+        <noscript
+          ><input type="hidden" name="redirect" value="submitconfirm.php"
+        /></noscript>
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+
+        <div class="row fileupload-buttonbar">
+          <div class="col-lg-7">
+            <!-- The fileinput-button span is used to style the file input field as button -->
+
+            <span class="btn btn-success fileinput-button">
+              <i class="glyphicon glyphicon-plus"></i>
+              <span>사진 추가</span>
+              <input type="file" name="input_img" id="input_img" multiple />
+            </span>
+
+            <button type="submit" name="submit" class="btn btn-primary start">
+              <i class="glyphicon glyphicon-upload"></i>
+              <span>Submit!</span>
+            </button>
+
+            <!--
+            <button type="reset" class="btn btn-warning cancel">
+              <i class="glyphicon glyphicon-ban-circle"></i>
+              <span>Cancel upload</span>
+            </button>
+            <button type="button" class="btn btn-danger delete">
+              <i class="glyphicon glyphicon-trash"></i>
+              <span>Delete selected</span>
+            </button>
+         
+            <input type="checkbox" class="toggle" />
+             -->
+            <!-- The global file processing state -->
+            <span class="fileupload-process"></span>
+          </div>
+          <!-- The global progress state -->
+          <div class="col-lg-5 fileupload-progress fade">
+            <!-- The global progress bar -->
+            <div
+              class="progress progress-striped active"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <div
+                class="progress-bar progress-bar-success"
+                style="width:0%;"
+              ></div>
+            </div>
+            <!-- The extended global progress state -->
+            <div class="progress-extended">&nbsp;</div>
+          </div>
+        </div>
+
+        <div>
+          <img id="img" width="400" />
+        </div>
+
+        <!-- The table listing the files available for upload/download -->
+        <table role="presentation" class="table table-striped">
+          <tbody class="files"></tbody>
+        </table>
+      </form>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">파일 업로드 시 주의사항</h3>
+        </div>
+        <div class="panel-body">
+          <ul>
+            <li>이미지 파일만 (<strong>JPG, PNG</strong>) 인식됩니다.</li>
+            <li>
+              추가설명
+            </li>
+            <!--
+            <li>
+              <strong>드래그(drag) &amp; 드롭(Drop)</strong> 은 지원이
+              안됩니다ㅠㅠ
+            </li>
+          --></ul>
+        </div>
+      </div>
+    </div>
+    <!-- The blueimp Gallery widget -->
+    <div
+      id="blueimp-gallery"
+      class="blueimp-gallery blueimp-gallery-controls"
+      data-filter=":even"
+    >
+      <div class="slides"></div>
+      <h3 class="title"></h3>
+      <a class="prev">‹</a>
+      <a class="next">›</a>
+      <a class="close">×</a>
+      <a class="play-pause"></a>
+      <ol class="indicator"></ol>
+    </div>
+    <!-- The template to display files available for upload -->
+
+    <!-- The template to display files available for download -->
+
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+      integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+      crossorigin="anonymous"
+    ></script>
+    <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+    <script src="js/vendor/jquery.ui.widget.js"></script>
+    <!-- The Templates plugin is included to render the upload/download listings -->
+    <script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
+    <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+    <script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
+    <!-- The Canvas to Blob plugin is included for image resizing functionality -->
+    <script src="https://blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
+    <!-- blueimp Gallery script -->
+    <script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+    <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+    <script src="js/jquery.iframe-transport.js"></script>
+    <!-- The basic File Upload plugin -->
+    <script src="js/jquery.fileupload.js"></script>
+    <!-- The File Upload processing plugin -->
+    <script src="js/jquery.fileupload-process.js"></script>
+    <!-- The File Upload image preview & resize plugin -->
+    <script src="js/jquery.fileupload-image.js"></script>
+    <!-- The File Upload audio preview plugin -->
+    <script src="js/jquery.fileupload-audio.js"></script>
+    <!-- The File Upload video preview plugin -->
+    <script src="js/jquery.fileupload-video.js"></script>
+    <!-- The File Upload validation plugin -->
+    <script src="js/jquery.fileupload-validate.js"></script>
+    <!-- The File Upload user interface plugin -->
+    <script src="js/jquery.fileupload-ui.js"></script>
+    <!-- The main application script -->
+    <script src="js/demo.js"></script>
+    <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
+    <!--[if (gte IE 8)&(lt IE 10)]>
+      <script src="js/cors/jquery.xdr-transport.js"></script>
+    <![endif]-->
+  </body>
+</html>
